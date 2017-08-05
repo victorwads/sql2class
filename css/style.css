@@ -1,0 +1,15 @@
+.card-java {
+	margin: 10px 0;
+}
+.card-java > div {
+	display: flex;
+	padding: 10px 15px;
+	border-bottom: 1px #bbb solid;
+}
+.card-java > div > h6 {
+	font-weight: bold;
+	flex: auto;
+}
+.card-java > pre {
+	padding:  10px 20px; 
+}

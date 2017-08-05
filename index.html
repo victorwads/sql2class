@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width">
+	<title>SQL to Java Class - @victorwads</title>
+	<!--link rel="shortcut icon" type="image/png" href="./imagens/favicon.png"/ -->
+	<!--link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"-->
+	<link rel="stylesheet" href="./css/material.min.css">
+	<link rel="stylesheet" href="./css/style.css">
+	<script src="./js/material.min.js"></script>
+	<script src="./js/index.js"></script>
+</head>
+<body>
+	<div class="mdl-layout mdl-js-layout">
+		<header class="mdl-layout__header">
+			<div class="mdl-layout__header-row">
+				<!-- Title -->
+				<span class="mdl-layout-title">SQL to Java Class</span>
+			</div>
+		</header>
+		<main class="mdl-layout__content">
+			<div class="page-content">
+				<div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
+					<div class="mdl-tabs__tab-bar">
+						<a href="#starks-panel" class="mdl-tabs__tab is-active">SQL Input</a>
+						<a href="#lannisters-panel" class="mdl-tabs__tab" id="btn-output">Java Class Output</a>
+					</div>
+
+					<div class="mdl-tabs__panel is-active" id="starks-panel">
+						<div class="mdl-grid">
+							<div class="mdl-cell mdl-cell--12-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+								<textarea class="mdl-textfield__input" type="text" rows="15" id="input"></textarea>
+								<label class="mdl-textfield__label" for="input">SQL Input</label>
+							</div>
+						</div>
+					</div>
+					<div class="mdl-tabs__panel" id="lannisters-panel">
+						<div class="mdl-grid">
+							<div class="mdl-cell mdl-cell--1-col"></div>
+							<div class="mdl-cell mdl-cell--10-col" id="java-cards-list"></div>
+							<div class="mdl-cell mdl-cell--1-col"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>
