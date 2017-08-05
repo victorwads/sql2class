@@ -13,3 +13,9 @@
 .card-java > pre {
 	padding:  10px 20px; 
 }
+
+#sql-code-box {
+	transition: opacity 0.2s;
+	opacity: 0;
+	height: 0;
+}

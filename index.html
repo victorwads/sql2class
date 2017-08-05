@@ -5,19 +5,30 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width">
 	<title>SQL to Java Class - @victorwads</title>
-	<!--link rel="shortcut icon" type="image/png" href="./imagens/favicon.png"/ -->
-	<!--link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"-->
+	<!-- <link rel="shortcut icon" type="image/png" href="./imagens/favicon.png"/> -->
+	<link rel="stylesheet" href="./css/material.icons.css">
 	<link rel="stylesheet" href="./css/material.min.css">
 	<link rel="stylesheet" href="./css/style.css">
+	<link rel="stylesheet" href="./css/googlecode.css">
+
 	<script src="./js/material.min.js"></script>
+	<script src="./js/highlight.pack.js"></script>
+	<script src="./js/FileSaver.js"></script>
+	<script src="./js/jszip.js"></script>
 	<script src="./js/index.js"></script>
 </head>
 <body>
-	<div class="mdl-layout mdl-js-layout">
+	<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
 		<header class="mdl-layout__header">
 			<div class="mdl-layout__header-row">
 				<!-- Title -->
-				<span class="mdl-layout-title">SQL to Java Class</span>
+				<span class="mdl-layout-title">
+					SQL
+					<i class="material-icons">dns</i>
+					<i class="material-icons">redo</i>
+					<i class="material-icons">code</i>
+					Java Code
+				</span>
 			</div>
 		</header>
 		<main class="mdl-layout__content">
@@ -30,17 +41,28 @@
 
 					<div class="mdl-tabs__panel is-active" id="starks-panel">
 						<div class="mdl-grid">
-							<div class="mdl-cell mdl-cell--12-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-								<textarea class="mdl-textfield__input" type="text" rows="15" id="input"></textarea>
-								<label class="mdl-textfield__label" for="input">SQL Input</label>
+							<div class="mdl-cell mdl-cell--1-col"></div>
+							<div class="mdl-cell mdl-cell--10-col">
+								<h4>Copie seu código SQL abaixo:</h4>
+								<div class="mdl-cell--12-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+									<textarea class="mdl-textfield__input" type="text" rows="1" id="input"></textarea>
+									<label class="mdl-textfield__label" for="input">SQL Input</label>
+								</div>
+								<pre class="mdl-cell--12-col mdl-card mdl-shadow--2dp" id="sql-code-box"><code class="sql" id="sql-code"></code></pre>
 							</div>
+							<div class="mdl-cell mdl-cell--1-col"></div>
 						</div>
 					</div>
 					<div class="mdl-tabs__panel" id="lannisters-panel">
 						<div class="mdl-grid">
-							<div class="mdl-cell mdl-cell--1-col"></div>
+							<div class="mdl-cell mdl-cell--3-col"></div>
+							<button class="mdl-cell mdl-cell--6-col mdl-cell--3-col-tablet mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" id="btn-download-all">
+								Salvar Tudo (Zip) <i class="material-icons">file_download</i>
+							</button>
+						</div>
+						<div class="mdl-grid">
+							<div class="mdl-cell mdl-cell--1-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
 							<div class="mdl-cell mdl-cell--10-col" id="java-cards-list"></div>
-							<div class="mdl-cell mdl-cell--1-col"></div>
 						</div>
 					</div>
 				</div>
