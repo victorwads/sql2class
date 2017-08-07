@@ -12,6 +12,7 @@
 }
 .card-java > pre {
 	padding:  10px 20px; 
+	white-space: pre-wrap;
 }
 
 #sql-code-box {
