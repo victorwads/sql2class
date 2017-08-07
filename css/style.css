@@ -11,8 +11,9 @@
 	flex: auto;
 }
 .card-java > pre {
-	padding:  10px 20px; 
+	padding:  10px 20px;
 	white-space: pre-wrap;
+	tab-size: 4;
 }
 .card-java > .mdl-textfield {
 	margin: 0 auto;

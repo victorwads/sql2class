@@ -19,8 +19,13 @@ window.onload = function(){
 			element.innerHTML = event.data.html;
 			cardsList.appendChild(element);
 
+			element = document.createElement('div');
+			element.className = 'mdl-cell mdl-cell--12-col mdl-card mdl-shadow--2dp card-java';
+			element.innerHTML = event.data.daoHtml;
+			cardsList.appendChild(element);
+
 			javaZipCode.file('model/' + event.data.className + '.java', event.data.javaCode);
-			javaZipCode.file('dao/' + 'EmBreve' + '.java', '');
+			javaZipCode.file('dao/' + event.data.className + '.java', event.data.javaDaoCode);
 		}else if(event.data.type === "end"){
 			if(event.data.total === 0){
 				downloadAll.style.display = 'none';
@@ -33,7 +38,7 @@ window.onload = function(){
 				'<pre><code class="java">O Bloco SQL de entrada não resultou em nenhum conteúdo. Tente com outro bloco de código SQL.</code></pre>';
 				cardsList.appendChild( element );
 			}else{
-				javaZipCode.file('dao/' + 'Conexao' + '.java', '//Em Breve');
+				javaZipCode.file('dao/' + 'Conexao' + '.java', event.data.conexao);
 				downloadAll.style.display = '';
 			}
 		}
