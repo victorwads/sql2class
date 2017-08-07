@@ -28,7 +28,7 @@ window.onload = function(){
 				element.className = 'mdl-cell mdl-cell--12-col mdl-card mdl-shadow--2dp card-java';
 				element.innerHTML =
 				'<div class="title">' +
-					'<h6 class="mdl-cell"><i class="material-icons">error</i> Sem conteúdo</h6>' +
+				'<h6 class="mdl-cell"><i class="material-icons">error</i> Sem conteúdo</h6>' +
 				'</div>' +
 				'<pre><code class="java">O Bloco SQL de entrada não resultou em nenhum conteúdo. Tente com outro bloco de código SQL.</code></pre>';
 				cardsList.appendChild( element );
@@ -84,3 +84,10 @@ window.onload = function(){
 	});
 
 };
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-104206956-2', 'auto');
+ga('send', 'pageview');
