@@ -18,6 +18,12 @@
 </head>
 <body>
 	<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+		<div class="mdl-layout__drawer">
+			<nav class="mdl-navigation">
+				<a class="mdl-navigation__link" href="https://victorwads.github.io/"><i class="material-icons">poll</i> Outros Projetos</a>
+				<a class="mdl-navigation__link" href="https://github.com/victorwads/sql2java" target="_blank"><i class="material-icons">code</i> GitHub</a>
+			</nav>
+		</div>
 		<header class="mdl-layout__header">
 			<div class="mdl-layout__header-row">
 				<!-- Title -->
@@ -34,25 +40,92 @@
 			<div class="page-content">
 				<div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
 					<div class="mdl-tabs__tab-bar">
-						<a href="#starks-panel" class="mdl-tabs__tab is-active">SQL Input</a>
-						<a href="#lannisters-panel" class="mdl-tabs__tab" id="btn-output">Java Class Output</a>
+						<a href="#tab_input" class="mdl-tabs__tab is-active"><i class="material-icons">dns</i> SQL Input</a>
+						<a href="#tab_output" class="mdl-tabs__tab" id="btn-output"><i class="material-icons">code</i> Gerar Java</a>
 					</div>
-
-					<div class="mdl-tabs__panel is-active" id="starks-panel">
+					<div class="mdl-tabs__panel is-active" id="tab_input">
 						<div class="mdl-grid">
-							<div class="mdl-cell mdl-cell--1-col"></div>
+							<div class="mdl-cell mdl-cell--1-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
 							<div class="mdl-cell mdl-cell--10-col">
-								<h4>Copie seu código abaixo: (MDL - Modelagem SQL)</h4>
-								<div class="mdl-cell--12-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-									<textarea class="mdl-textfield__input" type="text" rows="5" id="input"></textarea>
-									<label class="mdl-textfield__label" for="input">SQL Input</label>
+								<div class="mdl-cell mdl-cell--12-col mdl-card mdl-shadow--2dp card-java">
+									<div class="title">
+										<h6 class="mdl-cell mdl-cell--2-col"><i class="material-icons">dns</i> Copie seu código abaixo: (MDL - Model Description Language)</h6>
+									</div>
+									<div class="mdl-cell--12-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+										<textarea class="mdl-textfield__input" type="text" rows="15" id="input">
+-------------------------------------------------
+--                Exemplo MDL
+-------------------------------------------------
+
+CREATE DATABASE `RedeSocialDB1`;
+
+CREATE TABLE Pessoa (
+	ID bigint(11) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	nome varchar(60),
+	email varchar(60),
+	senha varchar(60)
+	-- Adicionar Dados Pessoas
+);
+
+CREATE TABLE PessoasAmigos (
+	ID_Pessoa1 int(11) unsigned NOT NULL,
+	ID_Pessoa2 int(11) unsigned NOT NULL,
+	valido tinyint(1) unsigned NOT NULL DEFAULT 0,
+	Unique (ID_Pessoa1, ID_Pessoa2),
+	Index (ID_Pessoa2),
+	Foreign Key (ID_Pessoa1) references Pessoas(ID),
+	Foreign Key (ID_Pessoa2) references Pessoas(ID)
+);
+
+CREATE TABLE Paises (
+	ID int(11) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	nome varchar(40) NOT NULL,
+	sigla char(2) NOT NULL
+);
+
+CREATE TABLE UnidadesFederativas (
+	ID int(11) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	ID_Pahis int(11) unsigned NOT NULL,
+	nome varchar(40) NOT NULL,
+	sigla varchar(4) DEFAULT NULL,
+	Unique (ID_pahis, sigla),
+	Foreign Key (ID_pahis) references Paises(ID)
+);
+
+CREATE TABLE Cidades (
+	ID int(11) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	ID_UnidadeFederativa int(11) unsigned NOT NULL,
+	nome varchar(40) NOT NULL,
+	Index (ID_UnidadeFederativa),
+	Foreign Key (ID_UnidadeFederativa) references UnidadesFederativas(ID)
+);</textarea>
+										<label class="mdl-textfield__label" for="input">SQL Input</label>
+									</div>
+									<pre class="mdl-cell--12-col mdl-card mdl-shadow--2dp" id="sql-code-box"><code class="sql" id="sql-code"></code></pre>
 								</div>
-								<pre class="mdl-cell--12-col mdl-card mdl-shadow--2dp" id="sql-code-box"><code class="sql" id="sql-code"></code></pre>
+								<div class="mdl-cell mdl-cell--12-col mdl-card mdl-shadow--2dp card-java">
+									<div class="title">
+										<h6 class="mdl-cell mdl-cell--2-col"><i class="material-icons">info_outline</i> Sobre</h6>
+										<a href="https://github.com/victorwads/sql2java" target="_blank">
+											<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+											<i class="material-icons">code</i> GitHub
+											</button>
+										</a>
+
+									</div>
+									<pre class="mdl-cell--12-col"><code>Nesta página é possível transformar comandos MDL em um zip em modelos Java.
+
+Este script cria o pacote "model" usando as informação dos comandos MDL. A partir de várias Regex ele identifica os campos das tabelas e as relações entre elas (Foreign Keys) assim mantendo o relacionamento dos Objetos com suas devidas classes.
+
+Os tipos de campo reconhecidos são: <b>SQL Type</b> <i class="material-icons">redo</i> Java Type
+
+<span class="mdl-chip"><span class="mdl-chip__text"><b>Longtext</b> <i class="material-icons">redo</i> String</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Text</b> <i class="material-icons">redo</i> String</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Varchar</b> <i class="material-icons">redo</i> String</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Char</b> <i class="material-icons">redo</i> String</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Character</b> <i class="material-icons">redo</i> String</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Set</b> <i class="material-icons">redo</i> String</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Multiset</b> <i class="material-icons">redo</i> String</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Boolean</b> <i class="material-icons">redo</i> boolean</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Smallint</b> <i class="material-icons">redo</i> int</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Tinyint</b> <i class="material-icons">redo</i> int</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Int</b> <i class="material-icons">redo</i> int</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Integer</b> <i class="material-icons">redo</i> int</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Numeric</b> <i class="material-icons">redo</i> int</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Interval</b> <i class="material-icons">redo</i> int</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Bigint</b> <i class="material-icons">redo</i> long</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Long</b> <i class="material-icons">redo</i> long</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Real</b> <i class="material-icons">redo</i> float</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Float</b> <i class="material-icons">redo</i> float</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Double</b> <i class="material-icons">redo</i> double</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Decimal</b> <i class="material-icons">redo</i> double</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Binary</b> <i class="material-icons">redo</i> byte[]</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Varbinary</b> <i class="material-icons">redo</i> byte[]</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Time</b> <i class="material-icons">redo</i> java.util.Date</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Date</b> <i class="material-icons">redo</i> java.util.Date</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Datetime</b> <i class="material-icons">redo</i> java.util.Date</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Timestamp</b> <i class="material-icons">redo</i> java.util.Date</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Blob</b> <i class="material-icons">redo</i> java.sql.Blob</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Longblob</b> <i class="material-icons">redo</i> java.sql.Blob</span></span> 
+									</code></pre>
+								</div>
 							</div>
-							<div class="mdl-cell mdl-cell--1-col"></div>
 						</div>
 					</div>
-					<div class="mdl-tabs__panel" id="lannisters-panel">
+					<div class="mdl-tabs__panel" id="tab_output">
 						<div class="mdl-grid">
 							<div class="mdl-cell mdl-cell--3-col"></div>
 							<button class="mdl-cell mdl-cell--6-col mdl-cell--3-col-tablet mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" id="btn-download-all">

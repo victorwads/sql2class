@@ -24,6 +24,7 @@ var doubleSpacesRegex = /  /g;
 var commentsRegex = /--.*\n|\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\//g;
 
 var datatypeInfo = {
+	LONGTEXT: "String",
 	TEXT: "String",
 	VARCHAR: "String",
 	CHAR: "String",
@@ -85,7 +86,7 @@ function processSQL(SQL){
 				for(var c in tables[ tableName ]){
 					if(tables[ tableName ][ c ].name === collumnName){
 						tables[ tableName ][ c ].javaType = tableReferenceName;
-						tables[ tableName ][ c ].name = collumnName.replace(/^id/i,"").descapitalize();
+						tables[ tableName ][ c ].name = collumnName.replace(/^iD/,"").descapitalize();
 						break;
 					}
 				}
@@ -115,7 +116,7 @@ function processFields(SQL){
 	var regexResult;
 	for(var i in all){
 		regexResult = all[i].match(collumnRegex);
-		if(regexResult === null)
+		if(regexResult === null || datatypeInfo[ regexResult[2].toUpperCase() ] === undefined)
 			continue;
 		fields.push({
 			name: regexResult[1].camelCase().descapitalize(),
@@ -132,11 +133,12 @@ function processTable(tableName, fields){
 
 	var i;
 	for (i in fields){
+		fields[i].name = fields[i].name.replace(/^iD/,"ID");
 		javaString += "\tprivate "+fields[i].javaType+" "+fields[i].name+";\n";
 	}
 
 	for(i in fields){
-		javaString += "\n\tpublic "+fields[i].javaType+" get"+fields[i].name.capitalize()+"(){\n";
+		javaString += "\n\tpublic "+fields[i].javaType+(fields[i].javaType==="boolean"?" is":" get")+fields[i].name.capitalize()+"(){\n";
 		javaString += "\t\treturn "+fields[i].name+";\n";
 		javaString += "\t}\n";
 
@@ -149,8 +151,8 @@ function processTable(tableName, fields){
 	return javaString;
 }
 function createJavaClass(className, javaCode){
-	return '<div>' +
-	'<h6 class="mdl-cell mdl-cell--10-col">' + className + '.java</h6>' +
+	return '<div class="title">' +
+	'<h6 class="mdl-cell mdl-cell--10-col"><i class="material-icons">description</i> ' + className + '.java</h6>' +
 	'<a href="data:text/java;charset=utf-8,' + encodeURIComponent(javaCode) + '" download="' + className + '.java">' +
 	'<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">' +
 	'Download <i class="material-icons">file_download</i>' +
@@ -162,7 +164,7 @@ function createJavaClass(className, javaCode){
 
 self.addEventListener('message', function(event) {
 	message = event.data;
-	if(message.type && message.type == "SQL" && message.sql)
+	if(message.type && message.type == "SQL" && message.sql !== undefined)
 		processSQL(message.sql);
 
 }, false);

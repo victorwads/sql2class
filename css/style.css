@@ -1,7 +1,7 @@
 .card-java {
 	margin: 10px 0;
 }
-.card-java > div {
+.card-java > .title {
 	display: flex;
 	padding: 10px 15px;
 	border-bottom: 1px #bbb solid;
@@ -14,9 +14,23 @@
 	padding:  10px 20px; 
 	white-space: pre-wrap;
 }
-
+.card-java > .mdl-textfield {
+	margin: 0 auto;
+}
 #sql-code-box {
+	display: none;
 	transition: opacity 0.2s;
 	opacity: 0;
 	height: 0;
+}
+i.material-icons {
+	position: relative;
+	top: 0.2em;
+	font-size: 1.4em;
+}
+pre i.material-icons {
+	font-style: italic;
+}
+button i.material-icons {
+	position: static;
 }

@@ -25,11 +25,10 @@ window.onload = function(){
 			if(event.data.total === 0){
 				downloadAll.style.display = 'none';
 				element = document.createElement('div');
-				element = document.createElement('div');
 				element.className = 'mdl-cell mdl-cell--12-col mdl-card mdl-shadow--2dp card-java';
 				element.innerHTML =
-				'<div>' +
-					'<h6 class="mdl-cell mdl-cell--10-col"><i class="material-icons">error</i> Sem conteúdo</h6>' +
+				'<div class="title">' +
+					'<h6 class="mdl-cell"><i class="material-icons">error</i> Sem conteúdo</h6>' +
 				'</div>' +
 				'<pre><code class="java">O Bloco SQL de entrada não resultou em nenhum conteúdo. Tente com outro bloco de código SQL.</code></pre>';
 				cardsList.appendChild( element );
