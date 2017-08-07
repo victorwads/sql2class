@@ -78,7 +78,7 @@ function processSQL(SQL){
 			}
 
 			regexResult = command.match(createTableRegex);
-			if( regexResult !== null ){
+			if( regexResult !== null && tables[ className ] === undefined ){
 				tables[ className ] = {
 					sqlName: regexResult[3],
 					javaName: className,
@@ -89,7 +89,7 @@ function processSQL(SQL){
 			regexResult = command.match(primaryKeyAddRegex);
 			if(regexResult !== null){
 				collumnName = regexResult[1].split(',');
-				/**/if(collumnName.length>1)console.log(className);
+				///**/if(collumnName.length>1)console.log(className);
 				for(var j in collumnName)
 					collumnName[j] = collumnName[j].trim().camelCase().descapitalize();
 				for(var p in tables[ className ].fields){
@@ -107,7 +107,7 @@ function processSQL(SQL){
 				for(var c in tables[ className ].fields){
 					if(tables[ className ].fields[ c ].name === collumnName){
 						tables[ className ].fields[ c ].javaType = tableReferenceName;
-						tables[ className ].fields[ c ].name = collumnName.replace(/^iD/,"").descapitalize();
+						tables[ className ].fields[ c ].name = collumnName.replace(/^iD(.+)/,"$1").descapitalize();
 						break;
 					}
 				}
@@ -162,25 +162,26 @@ function processTable(classInfo){
 	var className = classInfo.javaName;
 	var fields = classInfo.fields;
 
-	var javaString = "package model;\n\n"+
-	"public class " + className + " {\n";
+	var javaString = 'package model;\n\n'+
+	'public class ' + className + ' {\n';
 
 	var i;
 	for (i in fields){
-		fields[i].name = fields[i].name.replace(/^iD/,"ID");
-		javaString += "\tprivate "+fields[i].javaType+" "+fields[i].name+";\n";
+		fields[i].name = fields[i].name.replace(/^iD/,'ID');
+		javaString += '\tprivate '+fields[i].javaType+' '+fields[i].name+';\n';
 	}
 
 	for(i in fields){
-		javaString += "\n\tpublic "+fields[i].javaType+(fields[i].javaType==="boolean"?" is":" get")+fields[i].name.capitalize()+"(){\n";
-		javaString += "\t\treturn "+fields[i].name+";\n";
-		javaString += "\t}\n";
+		javaString += '\n\tpublic '+fields[i].javaType+(fields[i].javaType==='boolean'?' is':' get')+fields[i].name.capitalize()+'(){\n';
+		javaString += '\t\treturn '+fields[i].name+';\n';
+		javaString += '\t}\n';
 
-		javaString += "\n\tpublic void set"+fields[i].name.capitalize()+"("+fields[i].javaType+" "+fields[i].name+"){\n";
-		javaString += "\t\tthis."+fields[i].name+" = "+fields[i].name+";\n";
-		javaString += "\t}\n";
+		javaString += '\n\tpublic ' + className + ' set'+fields[i].name.capitalize()+'('+fields[i].javaType+' '+fields[i].name+'){\n';
+		javaString += '\t\tthis.'+fields[i].name+' = '+fields[i].name+';\n';
+		javaString += '\t\treturn this;\n';
+		javaString += '\t}\n';
 	}
-	javaString += "}";
+	javaString += '}';
 
 	return javaString;
 }
@@ -237,7 +238,7 @@ function createJavaDaoClass(classInfo){
 		if(f.javaType === 'java.util.Date')
 			javaClassCode += '\t\t\tps.setDate(++i, toDate(o.get' + f.name.capitalize() + '()));\n';
 		else
-			javaClassCode += '\t\t\tps.set' + f.javaType.capitalize() + '(++i, o.get' + f.name.capitalize() + '());\n';
+			javaClassCode += '\t\t\tps.set' + f.javaType.capitalize() + '(++i, o.' + (f.javaType==='boolean'?'is':'get') + f.name.capitalize() + '());\n';
 	}
 
 	javaClassCode +=
@@ -246,9 +247,10 @@ function createJavaDaoClass(classInfo){
 		primaryKey.length === 1?
 		'\t\t\tResultSet rs = ps.getGeneratedKeys();\n'+
 		'\t\t\trs.next();\n'+
-		'\t\t\to.set' + primaryKey[0].javaType.capitalize() + '(1, p.get' + primaryKey[0].name.capitalize() + '());\n'
+		'\t\t\to.set' + primaryKey[0].name.capitalize() + '(rs.get' + primaryKey[0].javaType.capitalize() + '(1));\n'
 		:''
 	)+
+	'\t\t} catch( Exception e ) {\n'+
 	'\t\t} finally {\n'+
 	'\t\t\tclose();\n'+
 	'\t\t}\n'+
@@ -258,21 +260,28 @@ function createJavaDaoClass(classInfo){
 	if(primaryKey.length){
 		javaClassCode +=
 		'\n'+
-		'\tpublic boolean atualizar(model.' + className + ' p) {\n'+
-		'\t\tif (p.getId() == 0) {\n'+
-		'\t\t\treturn false;\n'+
-		'\t\t}\n'+
+		'\tpublic boolean atualizar(model.' + className + ' o) {\n';
+
+		for(i in primaryKey){
+			f = primaryKey[i];
+			if(f.javaType === 'int' || f.javaType === 'long')
+				javaClassCode += '\t\tif (o.get' + f.name.capitalize() + '() == 0) return false;\n';
+			else
+				javaClassCode += '\t\tif (o.get' + f.name.capitalize() + '() == null) return false;\n';
+		}
+
+		javaClassCode +=
 		'\t\ttry {\n'+
 		'\t\t\tint i = 0;\n'+
-		'\t\t\tPreparedStatement ps = con.prepareStatement("UPDATE ' + classInfo.sqlName + ' SET ' + fieldsUpdatePlaceHolders.join(', ') + ' WHERE ' + primaryKeySet.join(' and ') + ');\n';
+		'\t\t\tPreparedStatement ps = con.prepareStatement("UPDATE ' + classInfo.sqlName + ' SET ' + fieldsUpdatePlaceHolders.join(', ') + ' WHERE ' + primaryKeySet.join(' and ') + '");\n';
 
 		var tempCode, tempCodeBlock = '';
 		for(i in fields){
 			f = fields[i];
 			if(f.javaType === 'java.util.Date')
-				tempCode = '\t\t\tps.setDate(++i, toDate(p.get' + f.name.capitalize() + '()));\n';
+				tempCode = '\t\t\tps.setDate(++i, toDate(o.get' + f.name.capitalize() + '()));\n';
 			else
-				tempCode = '\t\t\tps.set' + f.javaType.capitalize() + '(++i, p.get' + f.name.capitalize() + '());\n';
+				tempCode = '\t\t\tps.set' + f.javaType.capitalize() + '(++i, o.' + (f.javaType==='boolean'?'is':'get') + f.name.capitalize() + '());\n';
 			if(f.primary)
 				tempCodeBlock += tempCode;
 			else
@@ -291,7 +300,7 @@ function createJavaDaoClass(classInfo){
 	}
 	javaClassCode +=
 	'\n'+
-	'\tpublic boolean excluir(model.' + className + ' p) {\n'+
+	'\tpublic boolean excluir(model.' + className + ' o) {\n'+
 	'\t\ttry {\n'+
 	'\t\t\tint i = 0;\n'+
 	'\t\t\tPreparedStatement ps = con.prepareStatement("DELETE FROM ' + classInfo.sqlName + ' WHERE ' + primaryKeySet.join(' and ') + '");\n';
@@ -299,9 +308,9 @@ function createJavaDaoClass(classInfo){
 	for(i in primaryKey){
 		f = primaryKey[i];
 		if(f.javaType === 'java.util.Date')
-			javaClassCode += '\t\t\tps.setDate(++i, toDate(p.get' + f.name.capitalize() + '()));\n';
+			javaClassCode += '\t\t\tps.setDate(++i, toDate(o.get' + f.name.capitalize() + '()));\n';
 		else
-			javaClassCode += '\t\t\tps.set' + f.javaType.capitalize() + '(++i, p.get' + f.name.capitalize() + '());\n';
+			javaClassCode += '\t\t\tps.set' + f.javaType.capitalize() + '(++i, o.get' + f.name.capitalize() + '());\n';
 	}
 
 	javaClassCode +=
