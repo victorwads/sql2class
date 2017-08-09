@@ -6,6 +6,8 @@ window.onload = function(){
 	var cardsList = document.getElementById('java-cards-list');
 	var sqlCodeView = document.getElementById('sql-code');
 	var downloadAll = document.getElementById('btn-download-all');
+	var progress = document.getElementById('progress');
+	var jpa = document.getElementById('switch-jpa');
 	var javaZipCode;
 
 	var SQLWorker = new Worker('./js/workerSQLtoJava.js');
@@ -17,18 +19,21 @@ window.onload = function(){
 			element = document.createElement('div');
 			element.className = 'mdl-cell mdl-cell--12-col mdl-card mdl-shadow--2dp card-java';
 			element.innerHTML = event.data.html;
+			addViewCodeClick(element);
 			cardsList.appendChild(element);
 
 			element = document.createElement('div');
 			element.className = 'mdl-cell mdl-cell--12-col mdl-card mdl-shadow--2dp card-java';
 			element.innerHTML = event.data.daoHtml;
+			addViewCodeClick(element);
 			cardsList.appendChild(element);
 
 			javaZipCode.file('model/' + event.data.className + '.java', event.data.javaCode);
 			javaZipCode.file('dao/' + event.data.className + '.java', event.data.javaDaoCode);
 		}else if(event.data.type === "end"){
 			if(event.data.total === 0){
-				downloadAll.style.display = 'none';
+				downloadAll.style.opacity = 0;
+				progress.style.opacity = 0;
 				element = document.createElement('div');
 				element.className = 'mdl-cell mdl-cell--12-col mdl-card mdl-shadow--2dp card-java';
 				element.innerHTML =
@@ -39,19 +44,22 @@ window.onload = function(){
 				cardsList.appendChild( element );
 			}else{
 				javaZipCode.file('dao/' + 'Conexao' + '.java', event.data.conexao);
-				downloadAll.style.display = '';
+				downloadAll.style.opacity = 1;
+				progress.style.opacity = 0;
 			}
 		}
 	});
 
 	tabOutputButton.addEventListener('click', function (){
 
-		downloadAll.style.display = 'none';
+		downloadAll.style.opacity = 0;
+		progress.style.opacity = 1;
 		cardsList.innerHTML = '';
 		javaZipCode = new JSZip();
 		SQLWorker.postMessage({
 			type: 'SQL',
-			sql: input.value
+			sql: input.value,
+			jpa: jpa.checked,
 		});
 
 	});
@@ -89,6 +97,32 @@ window.onload = function(){
 	});
 
 };
+function addViewCodeClick(element){
+	var pre = element.querySelector('pre');
+	pre.style.height = 0;
+	pre.style.paddingTop = 0;
+	pre.style.paddingBottom = 0;
+	pre.style.marginTop = 0;
+	pre.style.marginBottom = 0;
+	element.querySelector('.btn-view').addEventListener('click', function (e){
+		if(this.viewEnabled){
+			pre.style.height = 0;
+			pre.style.paddingTop = 0;
+			pre.style.paddingBottom = 0;
+			pre.style.marginTop = 0;
+			pre.style.marginBottom = 0;
+			this.viewEnabled = false;
+		}else{
+			pre.style.height = pre.scrollHeight + 'px';
+			pre.style.paddingTop = '';
+			pre.style.paddingBottom = '';
+			pre.style.marginTop = '';
+			pre.style.marginBottom = '';
+			this.viewEnabled = true;
+		}
+	});
+
+}
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)

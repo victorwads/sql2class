@@ -1,5 +1,6 @@
 .card-java {
 	margin: 10px 0;
+	min-height: auto;
 }
 .card-java > .title {
 	display: flex;
@@ -11,9 +12,13 @@
 	flex: auto;
 }
 .card-java > pre {
-	padding:  10px 20px;
+	box-sizing: border-box;
+	padding: 10px 20px;
 	white-space: pre-wrap;
 	tab-size: 4;
+	transition-duration: .5s;
+	transition-property: height, margin, padding;
+	overflow: hidden;
 }
 .card-java > .mdl-textfield {
 	margin: 0 auto;
@@ -34,4 +39,8 @@ pre i.material-icons {
 }
 button i.material-icons {
 	position: static;
+}
+
+#progress, #btn-download-all {
+	transition: .5s opacity;
 }

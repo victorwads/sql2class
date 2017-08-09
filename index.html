@@ -49,7 +49,12 @@
 							<div class="mdl-cell mdl-cell--10-col">
 								<div class="mdl-cell mdl-cell--12-col mdl-card mdl-shadow--2dp card-java">
 									<div class="title">
-										<h6 class="mdl-cell mdl-cell--2-col"><i class="material-icons">dns</i> Copie seu código abaixo: (MDL - Model Description Language)</h6>
+										<h6 class="mdl-cell mdl-cell--10-col"><i class="material-icons">dns</i> Copie seu código abaixo: (MDL - Model Description Language)</h6>
+										<label class="mdl-cell mdl-cell--2-col mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-jpa" id="switch-jpa-box">
+											<input type="checkbox" id="switch-jpa" class="mdl-switch__input">
+											<span class="mdl-switch__label">JPA</span>
+										</label>
+										<div class="mdl-tooltip mdl-tooltip--large" data-mdl-for="switch-jpa-box">Criar anotações JPA<br />Java Persistence API</div>
 									</div>
 									<div class="mdl-cell--12-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
 										<textarea class="mdl-textfield__input" type="text" rows="15" id="input">
@@ -59,7 +64,7 @@
 
 CREATE DATABASE `RedeSocialDB1`;
 
-CREATE TABLE Pessoa (
+CREATE TABLE Pessoas (
 	ID bigint(11) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	nome varchar(60),
 	email varchar(60),
@@ -68,8 +73,8 @@ CREATE TABLE Pessoa (
 );
 
 CREATE TABLE PessoasAmigos (
-	ID_Pessoa1 int(11) unsigned NOT NULL,
-	ID_Pessoa2 int(11) unsigned NOT NULL,
+	ID_Pessoa1 bigint(11) unsigned NOT NULL,
+	ID_Pessoa2 bigint(11) unsigned NOT NULL,
 	valido tinyint(1) unsigned NOT NULL DEFAULT 0,
 	Unique (ID_Pessoa1, ID_Pessoa2),
 	Index (ID_Pessoa2),
@@ -122,7 +127,7 @@ O script agora também gera um pré código das classes Dao (Data Access Obejct)
 
 Os tipos de campo reconhecidos são: <b>SQL Type</b> <i class="material-icons">redo</i> Java Type
 
-<span class="mdl-chip"><span class="mdl-chip__text"><b>Longtext</b> <i class="material-icons">redo</i> String</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Text</b> <i class="material-icons">redo</i> String</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Varchar</b> <i class="material-icons">redo</i> String</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Char</b> <i class="material-icons">redo</i> String</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Character</b> <i class="material-icons">redo</i> String</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Set</b> <i class="material-icons">redo</i> String</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Multiset</b> <i class="material-icons">redo</i> String</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Boolean</b> <i class="material-icons">redo</i> boolean</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Tinyint(1)</b> <i class="material-icons">redo</i> boolean</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Tinyint</b> <i class="material-icons">redo</i> int</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Smallint</b> <i class="material-icons">redo</i> int</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Int</b> <i class="material-icons">redo</i> int</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Integer</b> <i class="material-icons">redo</i> int</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Numeric</b> <i class="material-icons">redo</i> int</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Interval</b> <i class="material-icons">redo</i> int</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Bigint</b> <i class="material-icons">redo</i> long</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Long</b> <i class="material-icons">redo</i> long</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Real</b> <i class="material-icons">redo</i> float</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Float</b> <i class="material-icons">redo</i> float</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Double</b> <i class="material-icons">redo</i> double</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Decimal</b> <i class="material-icons">redo</i> double</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Binary</b> <i class="material-icons">redo</i> byte[]</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Varbinary</b> <i class="material-icons">redo</i> byte[]</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Time</b> <i class="material-icons">redo</i> java.util.Date</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Date</b> <i class="material-icons">redo</i> java.util.Date</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Datetime</b> <i class="material-icons">redo</i> java.util.Date</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Timestamp</b> <i class="material-icons">redo</i> java.util.Date</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Blob</b> <i class="material-icons">redo</i> java.sql.Blob</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Longblob</b> <i class="material-icons">redo</i> java.sql.Blob</span></span> 
+<span class="mdl-chip"><span class="mdl-chip__text"><b>Longtext</b> <i class="material-icons">redo</i> String</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Text</b> <i class="material-icons">redo</i> String</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Varchar</b> <i class="material-icons">redo</i> String</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Char</b> <i class="material-icons">redo</i> String</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Character</b> <i class="material-icons">redo</i> String</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Set</b> <i class="material-icons">redo</i> String</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Multiset</b> <i class="material-icons">redo</i> String</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Boolean</b> <i class="material-icons">redo</i> boolean</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Tinyint(1)</b> <i class="material-icons">redo</i> boolean</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Tinyint</b> <i class="material-icons">redo</i> int</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Smallint</b> <i class="material-icons">redo</i> int</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Int</b> <i class="material-icons">redo</i> int</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Integer</b> <i class="material-icons">redo</i> int</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Numeric</b> <i class="material-icons">redo</i> int</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Interval</b> <i class="material-icons">redo</i> int</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Bigint</b> <i class="material-icons">redo</i> long</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Long</b> <i class="material-icons">redo</i> long</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Real</b> <i class="material-icons">redo</i> float</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Float</b> <i class="material-icons">redo</i> float</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Double</b> <i class="material-icons">redo</i> double</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Decimal</b> <i class="material-icons">redo</i> double</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Binary</b> <i class="material-icons">redo</i> byte[]</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Varbinary</b> <i class="material-icons">redo</i> byte[]</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Time</b> <i class="material-icons">redo</i> java.util.Date</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Date</b> <i class="material-icons">redo</i> java.util.Date</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Datetime</b> <i class="material-icons">redo</i> java.util.Date</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Timestamp</b> <i class="material-icons">redo</i> java.util.Date</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Blob</b> <i class="material-icons">redo</i> java.sql.Blob</span></span> <span class="mdl-chip"><span class="mdl-chip__text"><b>Longblob</b> <i class="material-icons">redo</i> java.sql.Blob</span></span>
 									</code></pre>
 								</div>
 							</div>
@@ -131,9 +136,12 @@ Os tipos de campo reconhecidos são: <b>SQL Type</b> <i class="material-icons">r
 					<div class="mdl-tabs__panel" id="tab_output">
 						<div class="mdl-grid">
 							<div class="mdl-cell mdl-cell--3-col"></div>
-							<button class="mdl-cell mdl-cell--6-col mdl-cell--3-col-tablet mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" id="btn-download-all">
-								Salvar Tudo (Zip) <i class="material-icons">file_download</i>
-							</button>
+							<div class="mdl-cell mdl-cell--6-col mdl-cell--3-col-tablet">
+								<button class="mdl-cell--12-col mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" id="btn-download-all">
+									Salvar Tudo (Zip) <i class="material-icons">file_download</i>
+								</button>
+								<div class="mdl-cell--12-col mdl-progress mdl-js-progress mdl-progress__indeterminate" id="progress"></div>
+							</div>
 						</div>
 						<div class="mdl-grid">
 							<div class="mdl-cell mdl-cell--1-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>

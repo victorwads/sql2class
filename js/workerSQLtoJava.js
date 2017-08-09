@@ -31,7 +31,7 @@ var datatypeInfo = {
 	INTERVAL: "int",		LONGBLOB: "java.sql.Blob"
 };
 
-function processSQL(SQL){
+function processSQL(SQL, jpa){
 
 	var tables = {};
 	var foreignKeys = {};
@@ -67,7 +67,7 @@ function processSQL(SQL){
 			if(regexResult !== null){
 				collumnName = regexResult[1].split(',');
 				for(var j in collumnName)
-					collumnName[j] = collumnName[j].trim().camelCase().descapitalize();
+					collumnName[j] = collumnName[j].trim().camelCase().uncapitalize();
 				for(var p in tables[ className ].fields){
 					if(collumnName.indexOf(tables[ className ].fields[ p ].name) !== -1){
 						tables[ className ].fields[ p ].primary = true;
@@ -76,14 +76,21 @@ function processSQL(SQL){
 			}
 
 			regexResult = command.match(foreignKeysRegex);
+			console.log(regexResult);
 			for(var f in regexResult){
 				var result = regexResult[f].match(foreignKeyRegex);
 				var tableReferenceName = result[3].camelCase();
-				collumnName = result[1].camelCase().descapitalize();
+				collumnName = generateFieldName(result[1]);
 				for(var c in tables[ className ].fields){
 					if(tables[ className ].fields[ c ].name === collumnName){
+						tables[ className ].fields[ c ].reference = true;
+						tables[ className ].fields[ c ].referenceType = tables[ className ].fields[ c ].javaType;
+						tables[ className ].fields[ c ].referenceFunc = generateFieldName(result[4]).capitalize();
 						tables[ className ].fields[ c ].javaType = tableReferenceName;
-						tables[ className ].fields[ c ].name = collumnName.replace(/^iD(.+)/,"$1").descapitalize();
+						tables[ className ].fields[ c ].funcName = collumnName.replace(new RegExp("/"+tableReferenceName+"/ig"),"").replace(/^ID/,"");
+						if(tables[ className ].fields[ c ].funcName === "")
+							tables[ className ].fields[ c ].funcName = tableReferenceName;
+						tables[ className ].fields[ c ].name = tables[ className ].fields[ c ].funcName.uncapitalize();
 						break;
 					}
 				}
@@ -94,7 +101,7 @@ function processSQL(SQL){
 	}
 	var total = 0;
 	for(className in tables){
-		var javaCode = processTable(tables[className]);
+		var javaCode = processTable(tables[className], jpa);
 		var javaDaoCode = createJavaDaoClass(tables[className]);
 		self.postMessage({
 			type: 'javaClass',
@@ -113,6 +120,9 @@ function processSQL(SQL){
 		conexao: ConexaoClass
 	});
 }
+function generateFieldName(name){
+	return name.camelCase().uncapitalize().replace(/^iD/,'ID');
+}
 function processFields(SQL){
 	var fields = [];
 	var all = SQL.split(',');
@@ -122,45 +132,51 @@ function processFields(SQL){
 		regexResult = all[i].match(collumnRegex);
 		if(regexResult === null || datatypeInfo[ regexResult[2].toUpperCase() ] === undefined)
 			continue;
-		fields.push({
+		field = {
+			sqlName: regexResult[1],
+			sqlType: regexResult[2],
 			auto: autoIncrementFieldRegex.test(all[i]),
 			primary: primaryKeyFieldRegex.test(all[i]),
-			name: regexResult[1].camelCase().descapitalize(),
-			javaType: datatypeInfo[ regexResult[2].toUpperCase() ],
-			sqlName: regexResult[1],
-			sqlType: regexResult[2]
-		});
+			reference: false
+		};
+		field.name = generateFieldName(field.sqlName);
+		field.funcName = field.name.capitalize();
+		field.javaType = datatypeInfo[ field.sqlType.toUpperCase() ];
+		field.getType = field.javaType==='boolean'?'is':'get';
+		fields.push(field);
 	}
 
 	return fields;
 }
-function processTable(classInfo){
+function processTable(classInfo, jpa){
 
 	var className = classInfo.javaName;
 	var fields = classInfo.fields;
+	var field;
 
 	var javaString = 'package model;\n\n'+
-	'@Entity\n'+
-	'@Table(name = "' + classInfo.sqlName + '")\n'+
+	(jpa?'@Entity\n':'')+
+	(jpa?'@Table(name = "' + classInfo.sqlName + '")\n':'')+
 	'public class ' + className + ' {\n\n';
 
 	var i;
 	for (i in fields){
-		fields[i].name = fields[i].name.replace(/^iD/,'ID');
+		field = fields[i];
 		javaString +=
-		(fields[i].primary?'\t@Id\n':'')+
-		(fields[i].auto?'\t@GeneratedValue\n':'')+
-		'\t@Column(name = "' + fields[i].sqlName + '")\n'+
-		'\tprivate '+fields[i].javaType+' '+fields[i].name+';\n';
+		(jpa&&field.primary?'\t@Id\n':'')+
+		(jpa&&field.auto?'\t@GeneratedValue\n':'')+
+		(jpa?'\t@Column(name = "' + field.sqlName + '")\n':'')+
+		'\tprivate '+field.javaType+' '+field.name+';\n';
 	}
 
 	for(i in fields){
-		javaString += '\n\tpublic '+fields[i].javaType+(fields[i].javaType==='boolean'?' is':' get')+fields[i].name.capitalize()+'(){\n';
-		javaString += '\t\treturn '+fields[i].name+';\n';
+		field = fields[i];
+		javaString += '\n\tpublic ' + field.javaType + ' ' + field.getType + field.funcName +'(){\n';
+		javaString += '\t\treturn '+field.name+';\n';
 		javaString += '\t}\n';
 
-		javaString += '\n\tpublic ' + className + ' set'+fields[i].name.capitalize()+'('+fields[i].javaType+' '+fields[i].name+'){\n';
-		javaString += '\t\tthis.'+fields[i].name+' = '+fields[i].name+';\n';
+		javaString += '\n\tpublic ' + className + ' set' + field.funcName + '(' + field.javaType + ' ' + field.name + '){\n';
+		javaString += '\t\tthis.' + field.name + ' = ' + field.name + ';\n';
 		javaString += '\t\treturn this;\n';
 		javaString += '\t}\n';
 	}
@@ -173,6 +189,7 @@ function createJavaDaoClass(classInfo){
 	var className = classInfo.javaName;
 	var fields = classInfo.fields;
 
+	var autoGenerated = null;
 	var primaryKey = [];
 	var primaryKeySet = [];
 	var fieldsNamesAll = [];
@@ -186,6 +203,8 @@ function createJavaDaoClass(classInfo){
 			primaryKey.push(fields[i]);
 			primaryKeySet.push(fields[i].sqlName + ' = ?');
 		}
+		if(fields[i].auto)
+			autoGenerated = fields[i];
 	}
 	for(i in fields){
 		f = fields[i];
@@ -196,6 +215,24 @@ function createJavaDaoClass(classInfo){
 		if(!fields[i].primary)
 			fieldsUpdatePlaceHolders.push(f.sqlName + ' = ?');
 		fieldsNamesAll.push(f.sqlName);
+	}
+
+	function setJDBCFieldCode(field){
+		if(field.javaType === 'java.util.Date')
+			return 'ps.setDate(++i, toDate(o.get' + field.funcName + '()));\n';
+		if(field.reference)
+			return 'ps.set' + field.referenceType.capitalize() + '(++i, o.get' + field.funcName + '().get' + field.referenceFunc + '() );\n';
+		else
+			return 'ps.set' + field.javaType.capitalize() + '(++i, o.' + field.getType + field.funcName + '());\n';
+	}
+	function getJDBCFieldCode(field){
+		if(field.javaType === 'java.util.Date')
+			return 'o.set' + field.funcName + '( toDate(rs.getDate(++i)) );\n';
+		if(field.reference){
+
+			return 'o.set' + field.funcName + '( new model.' + field.javaType + '().set' + field.referenceFunc + '( rs.get' + field.referenceType.capitalize() + '(++i) ) );\n';
+		}else
+			return 'o.set' + field.funcName + '(rs.get' + field.javaType.capitalize() + '(++i));\n';
 	}
 
 	var javaClassCode =
@@ -212,27 +249,21 @@ function createJavaDaoClass(classInfo){
 	'\t\tboolean ok = false;\n'+
 	'\t\ttry {\n'+
 	'\t\t\tint i = 0;\n'+
-	'\t\t\tPreparedStatement ps = con.prepareStatement("INSERT INTO ' + classInfo.sqlName + ' (' + fieldsNames.join(', ') + ') VALUES (' + fieldsInsertPlaceHolders.join(', ') + ')"' + (primaryKey.length?', Statement.RETURN_GENERATED_KEYS':'') + ');\n';
+	'\t\t\tPreparedStatement ps = con.prepareStatement("INSERT INTO ' + classInfo.sqlName + ' (' + fieldsNames.join(', ') + ') VALUES (' + fieldsInsertPlaceHolders.join(', ') + ')"' + (autoGenerated!==null?', Statement.RETURN_GENERATED_KEYS':'') + ');\n';
 
-	for(i in fields){
-		f = fields[i];
-		if(f.primary && primaryKey.length === 1)
-			continue;
-		if(f.javaType === 'java.util.Date')
-			javaClassCode += '\t\t\tps.setDate(++i, toDate(o.get' + f.name.capitalize() + '()));\n';
-		else
-			javaClassCode += '\t\t\tps.set' + f.javaType.capitalize() + '(++i, o.' + (f.javaType==='boolean'?'is':'get') + f.name.capitalize() + '());\n';
-	}
+	for(i in fields)
+		if(!f.auto)
+			javaClassCode += '\t\t\t' + setJDBCFieldCode(fields[i]);
 
 	javaClassCode +=
 	'\t\t\tok = ps.executeUpdate() > 0;\n'+
 	(
-		primaryKey.length === 1?
+		autoGenerated !== null?
 		'\t\t\tResultSet rs = ps.getGeneratedKeys();\n'+
 		'\t\t\trs.next();\n'+
-		'\t\t\to.set' + primaryKey[0].name.capitalize() + '(rs.get' + primaryKey[0].javaType.capitalize() + '(1));\n'
+		'\t\t\to.set' + autoGenerated.funcName + '(rs.get' + autoGenerated.javaType.capitalize() + '(1));\n'
 		:''
-	)+
+		)+
 	'\t\t} catch( Exception e ) {\n'+
 	'\t\t} finally {\n'+
 	'\t\t\tclose();\n'+
@@ -247,10 +278,11 @@ function createJavaDaoClass(classInfo){
 
 		for(i in primaryKey){
 			f = primaryKey[i];
-			if(f.javaType === 'int' || f.javaType === 'long')
-				javaClassCode += '\t\tif (o.get' + f.name.capitalize() + '() == 0) return false;\n';
+			javaClassCode += '\t\tif (o.' + f.getType + f.funcName + '() == ';
+			if( f.javaType === "String" )
+				javaClassCode += 'null) return false;\n';
 			else
-				javaClassCode += '\t\tif (o.get' + f.name.capitalize() + '() == null) return false;\n';
+				javaClassCode += '0) return false;\n';
 		}
 
 		javaClassCode +=
@@ -260,14 +292,10 @@ function createJavaDaoClass(classInfo){
 
 		var tempCode, tempCodeBlock = '';
 		for(i in fields){
-			f = fields[i];
-			if(f.javaType === 'java.util.Date')
-				tempCode = '\t\t\tps.setDate(++i, toDate(o.get' + f.name.capitalize() + '()));\n';
-			else
-				tempCode = '\t\t\tps.set' + f.javaType.capitalize() + '(++i, o.' + (f.javaType==='boolean'?'is':'get') + f.name.capitalize() + '());\n';
-			if(f.primary)
+			tempCode = '\t\t\t' + setJDBCFieldCode(fields[i]);
+			if(fields[i].primary)
 				tempCodeBlock += tempCode;
-			else
+			else if(!fields[i].auto)
 				javaClassCode += tempCode;
 		}
 
@@ -289,11 +317,7 @@ function createJavaDaoClass(classInfo){
 	'\t\t\tPreparedStatement ps = con.prepareStatement("DELETE FROM ' + classInfo.sqlName + ' WHERE ' + primaryKeySet.join(' and ') + '");\n';
 
 	for(i in primaryKey){
-		f = primaryKey[i];
-		if(f.javaType === 'java.util.Date')
-			javaClassCode += '\t\t\tps.setDate(++i, toDate(o.get' + f.name.capitalize() + '()));\n';
-		else
-			javaClassCode += '\t\t\tps.set' + f.javaType.capitalize() + '(++i, o.get' + f.name.capitalize() + '());\n';
+		javaClassCode += '\t\t\t' + setJDBCFieldCode(primaryKey[i]);
 	}
 
 	javaClassCode +=
@@ -317,13 +341,8 @@ function createJavaDaoClass(classInfo){
 	'\t\t\t\ti = 0;\n'+
 	'\t\t\t\to = new model.' + className + '();\n';
 
-	for(i in fields){
-		f = fields[i];
-		if(f.javaType === 'java.util.Date')
-			javaClassCode += '\t\t\t\to.set' + f.name.capitalize() + '(toDate(rs.getDate(++i)));\n';
-		else
-			javaClassCode += '\t\t\t\to.set' + f.name.capitalize() + '(rs.get' + f.javaType.capitalize() + '(++i));\n';
-	}
+	for(i in fields)
+		javaClassCode += '\t\t\t\t' + getJDBCFieldCode(fields[i]);
 
 	javaClassCode +=
 	'\t\t\t\tobjs.add(o);\n'+
@@ -356,12 +375,11 @@ function putLines(string){
 
 function createJavaClass(className, javaCode, dir){
 	return '<div class="title">' +
-	'<h6 class="mdl-cell mdl-cell--10-col"><i class="material-icons">description</i> ' + dir + className + '.java</h6>' +
-	'<a href="data:text/java;charset=utf-8,' + encodeURIComponent(javaCode) + '" download="' + (dir + className).replace("/","_") + '.java">' +
-	'<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">' +
-	'Download <i class="material-icons">file_download</i>' +
-	'</button>' +
-	'</a>' +
+		'<h6 class="mdl-cell mdl-cell--10-col"><i class="material-icons">description</i> ' + dir + className + '.java</h6>' +
+		'<a href="data:text/java;charset=utf-8,' + encodeURIComponent(javaCode) + '" download="' + (dir + className).replace("/","_") + '.java">' +
+				'<button class="mdl-button mdl-js-button"><i class="material-icons">file_download</i></button>' +
+		'</a>' +
+		'<button class="mdl-button mdl-js-button btn-view"><i class="material-icons">remove_red_eye</i></button>' +
 	'</div>' +
 	'<pre><code class="java">' + self.hljs.highlightAuto(putLines(javaCode)).value + '</code></pre>';
 }
@@ -369,18 +387,18 @@ function createJavaClass(className, javaCode, dir){
 self.addEventListener('message', function(event) {
 	message = event.data;
 	if(message.type && message.type == "SQL" && message.sql !== undefined)
-		processSQL(message.sql);
+		processSQL(message.sql, message.jpa);
 
 }, false);
 
 String.prototype.camelCase = function () {
 	return this.replace(/([A-Z])/g,"_$1").toLowerCase().replace(/[a-z]*/g, function(txt){
 		return txt.capitalize();
-	}).replace(/[^a-zA-Z]/g,"");
+	}).replace(/[^\w]|_/g,"");
 };
 String.prototype.capitalize = function (){
 	return this.charAt(0).toUpperCase() + this.substr(1);
 };
-String.prototype.descapitalize = function ()
+String.prototype.uncapitalize = function ()
 {	return this.charAt(0).toLowerCase() + this.substr(1);
 };
