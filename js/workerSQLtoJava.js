@@ -1,57 +1,34 @@
 importScripts('highlight.pack.js');
 
-String.prototype.camelCase = function () {
-	return this.replace(/([A-Z])/g,"_$1").toLowerCase().replace(/[a-z]*/g, function(txt){
-		return txt.capitalize();
-	}).replace(/[^a-zA-Z]/g,"");
-};
-String.prototype.capitalize = function (){
-	return this.charAt(0).toUpperCase() + this.substr(1);
-};
-String.prototype.descapitalize = function ()
-{	return this.charAt(0).toLowerCase() + this.substr(1);
-};
+var ConexaoClass = 'package dao;\n'+'\n'+'import java.sql.Connection;\n'+'import java.sql.DriverManager;\n'+'import java.sql.PreparedStatement;\n'+'\n'+'public class Conexao {\n'+'\n'+'\tprotected Connection con;\n'+'\tprivate boolean autoClose = true;\n'+'\n'+'\tpublic Conexao() {\n'+'\t\ttry {\n'+'\t\t\tfinal String URL = "jdbc:stringDeConexao";\n'+'\t\t\tcon = DriverManager.getConnection(URL, "DBlogin", "DBpassword");\n'+'\t\t\tPreparedStatement ps = con.prepareStatement("PRAGMA foreign_keys = ON");\n'+'\t\t\tps.execute();\n'+'\t\t} catch (Exception e) {\n'+'\t\t\te.printStackTrace();\n'+'\t\t}\n'+'\t}\n'+'\n'+'\tpublic void setAutoClose(boolean autoClose) {\n'+'\t\tthis.autoClose = autoClose;\n'+'\t}\n'+'\n'+'\tpublic void closeConnection() {\n'+'\t\ttry {\n'+'\t\t\tcon.close();\n'+'\t\t} catch (Exception e) {\n'+'\t\t}\n'+'\t}\n'+'\n'+'\tprotected void close() {\n'+'\t\tif (autoClose) {\n'+'\t\t\tcloseConnection();\n'+'\t\t}\n'+'\t}\n'+'\n'+'\tprotected java.sql.Date toDate(java.util.Date data) {\n'+'\t\treturn new java.sql.Date(data.getTime());\n'+'\t}\n'+'\n'+'\tprotected java.util.Date toDate(java.sql.Date data) {\n'+'\t\treturn new java.util.Date(data.getTime());\n'+'\t}\n'+'\n'+'}\n';
 
-var collumnRegex = /(\w+)\s+(\w+)[^,]*,?/;
-var nameTableRegex = /(alter|create)\s+table(\s+if\s+not\s+exists)?\s+(\w+)/i;
-var createTableRegex = /(alter|create)\s+table(\s+if\s+not\s+exists)?\s+(\w+)\s*\(\s*(.*)\s*\)/i;
-var foreignKeyRegex = /foreign\s+key\s*\(([\w,]*)\)\s*references\s+(\w*)\s*\(([\w,]*)\)/i;
-var foreignKeysRegex = /foreign\s+key\s*\(([\w,]*)\)\s*references\s+(\w*)\s*\(([\w,]*)\)/ig;
+var collumnRegex = /(\w+)\s+(\w+)[^,]*/;
+var nameTableRegex = /(alter|create)\s+table(\s+if\s+not\s+exists)?\s+(\w+\.)?(\w+)/i;
+var createTableRegex = /(alter|create)\s+table(\s+if\s+not\s+exists)?\s+(\w+\.)?(\w+)\s*\(\s*(.*)\s*\)/i;
+var foreignKeyRegex = /foreign\s+key\s*\(([\w,]+)\)\s*references\s+(\w+)\s*\(([\w,]+)\)/i;
+var foreignKeysRegex = /foreign\s+key\s*\(([\w,]+)\)\s*references\s+(\w+)\s*\(([\w,]+)\)/ig;
 var noUseCharactersRegex = /[\r\n`\[\]]/g;
+var autoIncrementFieldRegex = /(AUTO_INCREMENT|AUTOINCREMENT)/i;
 var primaryKeyAddRegex = /primary\s+key\s*\(([\w,]*)\)/i;
 var primaryKeyFieldRegex = /primary\s+key/i;
 var doubleSpacesRegex = /  /g;
 var commentsRegex = /--.*\n|\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\//g;
 
 var datatypeInfo = {
-	LONGTEXT: "String",
-	TEXT: "String",
-	VARCHAR: "String",
-	CHAR: "String",
-	CHARACTER: "String",
-	SET: "String",
-	MULTISET: "String",
-	BOOLEAN: "boolean",
-	SMALLINT: "int",
-	TINYINT: "int",
-	INT: "int",
-	INTEGER: "int",
-	NUMERIC: "int",
-	INTERVAL: "int",
-	BIGINT: "long",
-	LONG: "long",
-	REAL: "float",
-	FLOAT: "float",
-	DOUBLE: "double",
-	DECIMAL: "double",
-	BINARY: "byte[]",
-	VARBINARY: "byte[]",
-	TIME: "java.util.Date",
-	DATE: "java.util.Date",
-	DATETIME: "java.util.Date",
-	TIMESTAMP: "java.util.Date",
-	BLOB: "java.sql.Blob",
-	LONGBLOB: "java.sql.Blob"
+	LONGTEXT: "String",		BIGINT: "long",
+	TEXT: "String",			LONG: "long",
+	VARCHAR: "String",		REAL: "float",
+	CHAR: "String",			FLOAT: "float",
+	CHARACTER: "String",	DOUBLE: "double",
+	SET: "String",			DECIMAL: "double",
+	MULTISET: "String",		BINARY: "byte[]",
+	BOOLEAN: "boolean",		VARBINARY: "byte[]",
+	SMALLINT: "int",		TIME: "java.util.Date",
+	TINYINT: "int",			DATE: "java.util.Date",
+	INT: "int",				DATETIME: "java.util.Date",
+	INTEGER: "int",			TIMESTAMP: "java.util.Date",
+	NUMERIC: "int",			BLOB: "java.sql.Blob",
+	INTERVAL: "int",		LONGBLOB: "java.sql.Blob"
 };
 
 function processSQL(SQL){
@@ -73,23 +50,22 @@ function processSQL(SQL){
 		if( (command = commands[i].trim()) !== ""){
 
 			try {
-				className = command.match(nameTableRegex)[3].camelCase();
+				className = command.match(nameTableRegex)[4].camelCase();
 			} catch(e) {
 			}
 
 			regexResult = command.match(createTableRegex);
 			if( regexResult !== null && tables[ className ] === undefined ){
 				tables[ className ] = {
-					sqlName: regexResult[3],
+					sqlName: regexResult[4],
 					javaName: className,
-					fields: processFields( regexResult[4] )
+					fields: processFields( regexResult[5] )
 				};
 			}
 
 			regexResult = command.match(primaryKeyAddRegex);
 			if(regexResult !== null){
 				collumnName = regexResult[1].split(',');
-				///**/if(collumnName.length>1)console.log(className);
 				for(var j in collumnName)
 					collumnName[j] = collumnName[j].trim().camelCase().descapitalize();
 				for(var p in tables[ className ].fields){
@@ -133,9 +109,9 @@ function processSQL(SQL){
 	self.postMessage({
 		type: 'end',
 		total: total,
-		conexao: CONEXAO_STRING
+		targetSQL: SQL,
+		conexao: ConexaoClass
 	});
-	console.log(tables);
 }
 function processFields(SQL){
 	var fields = [];
@@ -146,7 +122,9 @@ function processFields(SQL){
 		regexResult = all[i].match(collumnRegex);
 		if(regexResult === null || datatypeInfo[ regexResult[2].toUpperCase() ] === undefined)
 			continue;
+		console.log(regexResult[1], autoIncrementFieldRegex.test(all[i]));
 		fields.push({
+			auto: autoIncrementFieldRegex.test(all[i]),
 			primary: primaryKeyFieldRegex.test(all[i]),
 			name: regexResult[1].camelCase().descapitalize(),
 			javaType: datatypeInfo[ regexResult[2].toUpperCase() ],
@@ -163,12 +141,18 @@ function processTable(classInfo){
 	var fields = classInfo.fields;
 
 	var javaString = 'package model;\n\n'+
-	'public class ' + className + ' {\n';
+	'@Entity\n'+
+	'@Table(name = "' + classInfo.sqlName + '")\n'+
+	'public class ' + className + ' {\n\n';
 
 	var i;
 	for (i in fields){
 		fields[i].name = fields[i].name.replace(/^iD/,'ID');
-		javaString += '\tprivate '+fields[i].javaType+' '+fields[i].name+';\n';
+		javaString +=
+		(fields[i].primary?'\t@Id\n':'')+
+		(fields[i].auto?'\t@GeneratedValue\n':'')+
+		'\t@Column(name = "' + fields[i].sqlName + '")\n'+
+		'\tprivate '+fields[i].javaType+' '+fields[i].name+';\n';
 	}
 
 	for(i in fields){
@@ -360,6 +344,17 @@ function createJavaDaoClass(classInfo){
 	'}\n';
 	return javaClassCode;
 }
+
+function putLines(string){
+	var lines = string.split("\n"), n;
+	var pad = ['',' ','  '];
+	for(var i in lines){
+		n = '' + (i*1+1);
+		lines[i] = n + pad[3-n.length] + '|' + lines[i];
+	}
+	return lines.join("\n");
+}
+
 function createJavaClass(className, javaCode, dir){
 	return '<div class="title">' +
 	'<h6 class="mdl-cell mdl-cell--10-col"><i class="material-icons">description</i> ' + dir + className + '.java</h6>' +
@@ -371,64 +366,6 @@ function createJavaClass(className, javaCode, dir){
 	'</div>' +
 	'<pre><code class="java">' + self.hljs.highlightAuto(putLines(javaCode)).value + '</code></pre>';
 }
-function putLines(string){
-	var lines = string.split("\n"), n;
-	var pad = ['',' ','  '];
-	for(var i in lines){
-		n = '' + (i*1+1);
-		lines[i] = n + pad[3-n.length] + '|' + lines[i];
-	}
-	return lines.join("\n");
-}
-
-var CONEXAO_STRING = 'package dao;\n'+
-'\n'+
-'import java.sql.Connection;\n'+
-'import java.sql.DriverManager;\n'+
-'import java.sql.PreparedStatement;\n'+
-'\n'+
-'public class Conexao {\n'+
-'\n'+
-'\tprotected Connection con;\n'+
-'\tprivate boolean autoClose = true;\n'+
-'\n'+
-'\tpublic Conexao() {\n'+
-'\t\ttry {\n'+
-'\t\t\tfinal String URL = "jdbc:stringDeConexao";\n'+
-'\t\t\tcon = DriverManager.getConnection(URL, "DBlogin", "DBpassword");\n'+
-'\t\t\tPreparedStatement ps = con.prepareStatement("PRAGMA foreign_keys = ON");\n'+
-'\t\t\tps.execute();\n'+
-'\t\t} catch (Exception e) {\n'+
-'\t\t\te.printStackTrace();\n'+
-'\t\t}\n'+
-'\t}\n'+
-'\n'+
-'\tpublic void setAutoClose(boolean autoClose) {\n'+
-'\t\tthis.autoClose = autoClose;\n'+
-'\t}\n'+
-'\n'+
-'\tpublic void closeConnection() {\n'+
-'\t\ttry {\n'+
-'\t\t\tcon.close();\n'+
-'\t\t} catch (Exception e) {\n'+
-'\t\t}\n'+
-'\t}\n'+
-'\n'+
-'\tprotected void close() {\n'+
-'\t\tif (autoClose) {\n'+
-'\t\t\tcloseConnection();\n'+
-'\t\t}\n'+
-'\t}\n'+
-'\n'+
-'\tprotected java.sql.Date toDate(java.util.Date data) {\n'+
-'\t\treturn new java.sql.Date(data.getTime());\n'+
-'\t}\n'+
-'\n'+
-'\tprotected java.util.Date toDate(java.sql.Date data) {\n'+
-'\t\treturn new java.util.Date(data.getTime());\n'+
-'\t}\n'+
-'\n'+
-'}\n';
 
 self.addEventListener('message', function(event) {
 	message = event.data;
@@ -436,3 +373,15 @@ self.addEventListener('message', function(event) {
 		processSQL(message.sql);
 
 }, false);
+
+String.prototype.camelCase = function () {
+	return this.replace(/([A-Z])/g,"_$1").toLowerCase().replace(/[a-z]*/g, function(txt){
+		return txt.capitalize();
+	}).replace(/[^a-zA-Z]/g,"");
+};
+String.prototype.capitalize = function (){
+	return this.charAt(0).toUpperCase() + this.substr(1);
+};
+String.prototype.descapitalize = function ()
+{	return this.charAt(0).toLowerCase() + this.substr(1);
+};
