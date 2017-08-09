@@ -5,8 +5,8 @@ var ConexaoClass = 'package dao;\n'+'\n'+'import java.sql.Connection;\n'+'import
 var collumnRegex = /(\w+)\s+(\w+)[^,]*/;
 var nameTableRegex = /(alter|create)\s+table(\s+if\s+not\s+exists)?\s+(\w+\.)?(\w+)/i;
 var createTableRegex = /(alter|create)\s+table(\s+if\s+not\s+exists)?\s+(\w+\.)?(\w+)\s*\(\s*(.*)\s*\)/i;
-var foreignKeyRegex = /foreign\s+key\s*\(([\w,]+)\)\s*references\s+(\w+)\s*\(([\w,]+)\)/i;
-var foreignKeysRegex = /foreign\s+key\s*\(([\w,]+)\)\s*references\s+(\w+)\s*\(([\w,]+)\)/ig;
+var foreignKeyRegex = /foreign\s+key\s*\(([\w,]+)\)\s*references\s+(\w+\.)?(\w+)\s*\(([\w,]+)\)/i;
+var foreignKeysRegex = /foreign\s+key\s*\(([\w,]+)\)\s*references\s+(\w+\.)?(\w+)\s*\(([\w,]+)\)/ig;
 var noUseCharactersRegex = /[\r\n`\[\]]/g;
 var autoIncrementFieldRegex = /(AUTO_INCREMENT|AUTOINCREMENT)/i;
 var primaryKeyAddRegex = /primary\s+key\s*\(([\w,]*)\)/i;
@@ -78,7 +78,7 @@ function processSQL(SQL){
 			regexResult = command.match(foreignKeysRegex);
 			for(var f in regexResult){
 				var result = regexResult[f].match(foreignKeyRegex);
-				var tableReferenceName = result[2].camelCase();
+				var tableReferenceName = result[3].camelCase();
 				collumnName = result[1].camelCase().descapitalize();
 				for(var c in tables[ className ].fields){
 					if(tables[ className ].fields[ c ].name === collumnName){
@@ -122,7 +122,6 @@ function processFields(SQL){
 		regexResult = all[i].match(collumnRegex);
 		if(regexResult === null || datatypeInfo[ regexResult[2].toUpperCase() ] === undefined)
 			continue;
-		console.log(regexResult[1], autoIncrementFieldRegex.test(all[i]));
 		fields.push({
 			auto: autoIncrementFieldRegex.test(all[i]),
 			primary: primaryKeyFieldRegex.test(all[i]),
