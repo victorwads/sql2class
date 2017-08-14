@@ -1,42 +1,35 @@
 //Origin Idea code - http://tools.knowledgewalls.com/mysqltabletojavaclass
 window.onload = function(){
 
+	var inputLanguage = document.getElementById('language');
 	var inputPackage = document.getElementById('package');
 	var input = document.getElementById('input');
 	var tabOutputButton = document.getElementById('btn-output');
-	var cardsList = document.getElementById('java-cards-list');
+	var cardsList = document.getElementById('language-cards-list');
 	var sqlCodeView = document.getElementById('sql-code');
 	var downloadAll = document.getElementById('btn-download-all');
 	var progress = document.getElementById('progress');
 	var jpa = document.getElementById('switch-jpa');
 	var javaZipCode;
 
-	var SQLWorker = new Worker('./js/workerSQLtoJava.js');
+	var SQLWorker = new Worker('./js/workerSQLtoClass.js');
 	SQLWorker.addEventListener('message', function (event){
 		if(!event.data.type)
 			return;
 		var element;
-		if(event.data.type === "javaClass"){
+		if(event.data.type === "LanguageClass"){
 			element = document.createElement('div');
-			element.className = 'mdl-cell mdl-cell--12-col mdl-card mdl-shadow--2dp card-java';
-			element.innerHTML = event.data.html;
+			element.className = 'mdl-cell mdl-cell--12-col mdl-card mdl-shadow--2dp language-card';
+			element.innerHTML = createLanguageClass(event.data.fileName, event.data.Code, event.data.highlightedCode);
 			addViewCodeClick(element);
 			cardsList.appendChild(element);
-
-			element = document.createElement('div');
-			element.className = 'mdl-cell mdl-cell--12-col mdl-card mdl-shadow--2dp card-java';
-			element.innerHTML = event.data.daoHtml;
-			addViewCodeClick(element);
-			cardsList.appendChild(element);
-
-			javaZipCode.file('model/' + event.data.className + '.java', event.data.javaCode);
-			javaZipCode.file('dao/' + event.data.daoPrefix + event.data.className + '.java', event.data.javaDaoCode);
+			javaZipCode.file(event.data.fileName, event.data.Code);
 		}else if(event.data.type === "end"){
 			if(event.data.total === 0){
 				downloadAll.style.opacity = 0;
 				progress.style.opacity = 0;
 				element = document.createElement('div');
-				element.className = 'mdl-cell mdl-cell--12-col mdl-card mdl-shadow--2dp card-java';
+				element.className = 'mdl-cell mdl-cell--12-col mdl-card mdl-shadow--2dp language-card';
 				element.innerHTML =
 				'<div class="title">' +
 				'<h6 class="mdl-cell"><i class="material-icons">error</i> Sem conteúdo</h6>' +
@@ -44,7 +37,6 @@ window.onload = function(){
 				'<pre><code class="java">O Bloco SQL de entrada não resultou em nenhum conteúdo. Tente com outro bloco de código SQL.</code></pre>';
 				cardsList.appendChild( element );
 			}else{
-				javaZipCode.file('dao/' + 'Conexao' + '.java', event.data.conexao);
 				downloadAll.style.opacity = 1;
 				progress.style.opacity = 0;
 			}
@@ -61,6 +53,7 @@ window.onload = function(){
 			type: 'SQL',
 			sql: input.value,
 			jpa: jpa.checked,
+			language: inputLanguage.getAttribute('data-val'),
 			package: inputPackage.value,
 		});
 
@@ -125,6 +118,17 @@ function addViewCodeClick(element){
 	});
 
 }
+function createLanguageClass(fileName, Code, highlightedCode){
+	return '<div class="title">' +
+		'<h6 class="mdl-cell mdl-cell--10-col"><i class="material-icons">description</i> ' + fileName + '</h6>' +
+		'<a href="data:text/java;charset=utf-8,' + encodeURIComponent(Code) + '" download="' + (fileName+'').replace("/","_") + '">' +
+				'<button class="mdl-button mdl-js-button"><i class="material-icons">file_download</i></button>' +
+		'</a>' +
+		'<button class="mdl-button mdl-js-button btn-view"><i class="material-icons">remove_red_eye</i></button>' +
+	'</div>' +
+	'<pre><code>' + highlightedCode + '</code></pre>';
+}
+
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)

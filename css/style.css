@@ -1,17 +1,17 @@
-.card-java {
+.language-card {
 	margin: 10px 0;
 	min-height: auto;
 }
-.card-java > .title {
+.language-card > .title {
 	display: flex;
 	padding: 10px 15px;
 	border-bottom: 1px #bbb solid;
 }
-.card-java > div > h6 {
+.language-card > div > h6 {
 	font-weight: bold;
 	flex: auto;
 }
-.card-java > pre {
+.language-card > pre {
 	box-sizing: border-box;
 	padding: 10px 20px;
 	white-space: pre-wrap;
@@ -20,7 +20,7 @@
 	transition-property: height, margin, padding;
 	overflow: hidden;
 }
-.card-java > .mdl-textfield {
+.language-card > .mdl-textfield {
 	margin: 0 auto;
 }
 #sql-code-box {
