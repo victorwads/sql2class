@@ -1,6 +1,7 @@
 //Origin Idea code - http://tools.knowledgewalls.com/mysqltabletojavaclass
 window.onload = function(){
 
+	var inputPackage = document.getElementById('package');
 	var input = document.getElementById('input');
 	var tabOutputButton = document.getElementById('btn-output');
 	var cardsList = document.getElementById('java-cards-list');
@@ -29,7 +30,7 @@ window.onload = function(){
 			cardsList.appendChild(element);
 
 			javaZipCode.file('model/' + event.data.className + '.java', event.data.javaCode);
-			javaZipCode.file('dao/' + event.data.className + '.java', event.data.javaDaoCode);
+			javaZipCode.file('dao/' + event.data.daoPrefix + event.data.className + '.java', event.data.javaDaoCode);
 		}else if(event.data.type === "end"){
 			if(event.data.total === 0){
 				downloadAll.style.opacity = 0;
@@ -60,6 +61,7 @@ window.onload = function(){
 			type: 'SQL',
 			sql: input.value,
 			jpa: jpa.checked,
+			package: inputPackage.value,
 		});
 
 	});

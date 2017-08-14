@@ -8,10 +8,12 @@
 	<link rel="shortcut icon" type="image/png" href="./imagens/favicon.png"/>
 	<link rel="stylesheet" href="./css/material.icons.css">
 	<link rel="stylesheet" href="./css/material.min.css">
+	<link rel="stylesheet" href="./css/getmdl-select.min.css">
 	<link rel="stylesheet" href="./css/style.css">
 	<link rel="stylesheet" href="./css/googlecode.css">
 
 	<script src="./js/material.min.js"></script>
+	<script src="./js/getmdl-select.min.js"></script>
 	<script src="./js/jszip.js"></script>
 	<script src="./js/FileSaver.js"></script>
 	<script src="./js/index.js"></script>
@@ -47,14 +49,27 @@
 						<div class="mdl-grid">
 							<div class="mdl-cell mdl-cell--1-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
 							<div class="mdl-cell mdl-cell--10-col">
-								<div class="mdl-cell mdl-cell--12-col mdl-card mdl-shadow--2dp card-java">
-									<div class="title">
+								<div class="mdl-grid mdl-cell mdl-cell--12-col mdl-card mdl-shadow--2dp card-java">
+									<div class="title mdl-cell mdl-cell--12-col">
 										<h6 class="mdl-cell mdl-cell--10-col"><i class="material-icons">dns</i> Copie seu código abaixo: (MDL - Model Description Language)</h6>
 										<label class="mdl-cell mdl-cell--2-col mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-jpa" id="switch-jpa-box">
 											<input type="checkbox" id="switch-jpa" class="mdl-switch__input">
 											<span class="mdl-switch__label">JPA</span>
 										</label>
 										<div class="mdl-tooltip mdl-tooltip--large" data-mdl-for="switch-jpa-box">Criar anotações JPA<br />Java Persistence API</div>
+									</div>
+									<div class="mdl-cell--2-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fullwidth">
+										<input class="mdl-textfield__input" type="text" id="language" value="Java" readonly>
+										<label for="language" class="mdl-textfield__label">Linguagem</label>
+										<ul for="language" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+											<li class="mdl-menu__item" data-val="java">Java</li>
+											<li class="mdl-menu__item" data-val="cs">C# (Em Breve)</li>
+											<li class="mdl-menu__item" data-val="php">PHP (Em Breve)</li>
+										</ul>
+									</div>
+									<div class="mdl-cell--10-col  mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+										<input class="mdl-textfield__input" type="text" id="package" value="com.example.sqltoclass">
+										<label class="mdl-textfield__label" for="package">Package</label>
 									</div>
 									<div class="mdl-cell--12-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
 										<textarea class="mdl-textfield__input" type="text" rows="15" id="input">
