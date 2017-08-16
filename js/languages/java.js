@@ -168,6 +168,7 @@ function processDaoClass(package, classInfo){
 		:''
 		)+
 	'\t\t} catch( Exception e ) {\n'+
+	'\t\t\te.printStackTrace();\n'+
 	'\t\t} finally {\n'+
 	'\t\t\tclose();\n'+
 	'\t\t}\n'+
@@ -206,6 +207,7 @@ function processDaoClass(package, classInfo){
 		tempCodeBlock+
 		'\t\t\treturn ps.executeUpdate() > 0;\n'+
 		'\t\t} catch (Exception e) {\n'+
+		'\t\t\te.printStackTrace();\n'+
 		'\t\t\treturn false;\n'+
 		'\t\t} finally {\n'+
 		'\t\t\tclose();\n'+
@@ -226,6 +228,7 @@ function processDaoClass(package, classInfo){
 	javaClassCode +=
 	'\t\t\treturn ps.executeUpdate() > 0;\n'+
 	'\t\t} catch (Exception e) {\n'+
+	'\t\t\te.printStackTrace();\n'+
 	'\t\t\treturn false;\n'+
 	'\t\t} finally {\n'+
 	'\t\t\tclose();\n'+
