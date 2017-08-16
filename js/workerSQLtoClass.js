@@ -147,7 +147,7 @@ function putLines(string){
 self.addEventListener('message', function(event) {
 	message = event.data;
 	if(message.type && message.type == "SQL" && message.sql !== undefined)
-		processSQL(message.sql, message.jpa, message.package+'.', message.language);
+		processSQL(message.sql, message.jpa, message.package===""?"":(message.package+'.'), message.language);
 
 }, false);
 
