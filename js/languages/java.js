@@ -127,23 +127,27 @@ function processDaoClass(package, classInfo){
 	'\t}\n'+
 	'\n'+
 	'\tprivate PreparedStatement preparaPesquisa(String Sql, Usuarios o) throws SQLException {\n'+
-	'\t\tString where = "";\n';
+	'\t\tString where = "";\n'+
+	'\t\tif(o != null) {\n';
 
 	for(i in fields){
-		javaClassCode += '\t\t' + setJDBCFieldIfSearch(fields[i]) + 'where += " and ' + fields[i].sqlName + ' = ?";\n';
+		javaClassCode += '\t\t\t' + setJDBCFieldIfSearch(fields[i]) + 'where += " and ' + fields[i].sqlName + ' = ?";\n';
 	}
 
 	javaClassCode +=
+	'\t\t}\n'+
 	'\t\twhere = where.replace("and", "WHERE");\n'+
 	'\t\t\n'+
 	'\t\tPreparedStatement ps = con.prepareStatement("SELECT ' + fieldsNamesAll.join(', ') + ' FROM " + TABLE_NAME + where);\n'+
-	'\t\tint i = 0;\n';
+	'\t\tint i = 0;\n'+
+	'\t\tif(o != null) {\n';
 
 	for(i in fields){
 		javaClassCode += '\t\t' + setJDBCFieldIfSearch(fields[i]) + setJDBCFieldCode(fields[i]);
 	}
 
 	javaClassCode +=
+	'\t}\n'+
 	'\t\treturn ps;\n'+
 	'\t}\n'+
 	'\n'+
@@ -304,6 +308,7 @@ function processDaoClass(package, classInfo){
 		LONGTEXT: "String",		BIGINT: "long",
 		TEXT: "String",			LONG: "long",
 		VARCHAR: "String",		REAL: "float",
+		STRING: "String",
 		CHAR: "String",			FLOAT: "float",
 		CHARACTER: "String",	DOUBLE: "double",
 		SET: "String",			DECIMAL: "double",
