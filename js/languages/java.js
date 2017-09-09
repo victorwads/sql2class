@@ -111,7 +111,7 @@ function processDaoClass(package, classInfo){
 	'import java.sql.Statement;\n'+
 	'import java.util.ArrayList;\n'+
 	'\n'+
-	'import '+package+'model.'+classInfo.languageName+';\n'+
+	'import '+package+'model.*;\n'+
 	'\n'+
 	'public class ' + className + ' extends Conexao {\n'+
 	'\n'+
@@ -126,7 +126,7 @@ function processDaoClass(package, classInfo){
 	javaClassCode +=
 	'\t}\n'+
 	'\n'+
-	'\tprivate PreparedStatement preparaPesquisa(String Sql, Usuarios o) throws SQLException {\n'+
+	'\tprivate PreparedStatement preparaPesquisa(String Sql, ' + classInfo.languageName + ' o) throws SQLException {\n'+
 	'\t\tString where = "";\n';
 
 	for(i in fields){
@@ -134,7 +134,7 @@ function processDaoClass(package, classInfo){
 	}
 
 	javaClassCode +=
-	'\t\twhere = where.replace("and", "WHERE");\n'+
+	'\t\twhere = where.replaceFirst("and", "WHERE");\n'+
 	'\t\t\n'+
 	'\t\tPreparedStatement ps = con.prepareStatement("SELECT ' + fieldsNamesAll.join(', ') + ' FROM " + TABLE_NAME + where);\n'+
 	'\t\tint i = 0;\n';
@@ -308,7 +308,7 @@ function processDaoClass(package, classInfo){
 		CHARACTER: "String",	DOUBLE: "double",
 		SET: "String",			DECIMAL: "double",
 		MULTISET: "String",		BINARY: "byte[]",
-		BOOLEAN: "boolean",		VARBINARY: "byte[]",
+		BOOLEAN: "Boolean",		VARBINARY: "byte[]",
 		SMALLINT: "int",		TIME: "java.util.Date",
 		TINYINT: "int",			DATE: "java.util.Date",
 		INT: "int",				DATETIME: "java.util.Date",

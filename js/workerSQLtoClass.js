@@ -54,7 +54,7 @@ function processSQL(SQL, jpa, package, languageName){
 			if(regexResult !== null){
 				collumnName = regexResult[1].split(',');
 				for(var j in collumnName)
-					collumnName[j] = collumnName[j].trim().camelCase().uncapitalize();
+					collumnName[j] = generateFieldName(collumnName[j].trim());
 				for(var p in tables[ className ].fields){
 					if(collumnName.indexOf(tables[ className ].fields[ p ].name) !== -1){
 						tables[ className ].fields[ p ].primary = true;
@@ -86,10 +86,10 @@ function processSQL(SQL, jpa, package, languageName){
 		}
 	}
 	var total = 0;
-	console.log(language);
+	var languageClasses, l;
 	for(className in tables){
-		var languageClasses = language.processClasses(package, tables[className], jpa);
-		for(var l in languageClasses){
+		languageClasses = language.processClasses(package, tables[className], jpa);
+		for(l in languageClasses){
 			self.postMessage({
 				type: 'LanguageClass',
 				fileName: languageClasses[l].fileName,
@@ -98,6 +98,16 @@ function processSQL(SQL, jpa, package, languageName){
 			});
 			total++;
 		}
+	}
+	languageClasses = language.adcionalClasses();
+	for(l in languageClasses){
+		self.postMessage({
+			type: 'LanguageClass',
+			fileName: languageClasses[l].fileName,
+			Code: languageClasses[l].Code,
+			highlightedCode: self.hljs.highlightAuto(putLines(languageClasses[l].Code)).value,
+		});
+		total++;
 	}
 	self.postMessage({
 		type: 'end',
