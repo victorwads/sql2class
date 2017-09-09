@@ -12,6 +12,7 @@ var foreignKeyRegex = /foreign\s+key\s*\(([\w,]+)\)\s*references\s+(\w+\.)?(\w+)
 var foreignKeysRegex = /foreign\s+key\s*\(([\w,]+)\)\s*references\s+(\w+\.)?(\w+)\s*\(([\w,]+)\)/ig;
 var noUseCharactersRegex = /[\r\n`\[\]]/g;
 var autoIncrementFieldRegex = /(AUTO_INCREMENT|AUTOINCREMENT)/i;
+var autoIncrementAddRegex = /(AUTO_INCREMENT|AUTOINCREMENT)/i;
 var primaryKeyAddRegex = /primary\s+key\s*\(([\w,]*)\)/i;
 var primaryKeyFieldRegex = /primary\s+key/i;
 var doubleSpacesRegex = /  /g;
@@ -50,6 +51,7 @@ function processSQL(SQL, jpa, package, languageName){
 				};
 			}
 
+			//TODO: Reconize Alter Table Auto Increment
 			regexResult = command.match(primaryKeyAddRegex);
 			if(regexResult !== null){
 				collumnName = regexResult[1].split(',');

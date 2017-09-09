@@ -87,6 +87,8 @@ function processDaoClass(package, classInfo){
 	function setJDBCFieldCode(field){
 		if(field.languageType === 'java.util.Date')
 			return 'ps.setDate(++i, toDate(o.get' + field.funcName + '()));\n';
+		if(field.languageType === 'Boolean')
+			return 'ps.setBoolean(++i, o.get' + field.funcName + '() == null ? false : o.get' + field.funcName + '() );\n';
 		if(field.reference)
 			return 'ps.set' + field.referenceType.capitalize() + '(++i, o.get' + field.funcName + '().get' + field.referenceFunc + '() );\n';
 		else
@@ -95,11 +97,10 @@ function processDaoClass(package, classInfo){
 	function getJDBCFieldCode(field){
 		if(field.languageType === 'java.util.Date')
 			return 'o.set' + field.funcName + '( toDate(rs.getDate(++i)) );\n';
-		if(field.reference){
-
+		if(field.reference)
 			return 'o.set' + field.funcName + '( new ' + field.languageType + '().set' + field.referenceFunc + '( rs.get' + field.referenceType.capitalize() + '(++i) ) );\n';
-		}else
-		return 'o.set' + field.funcName + '(rs.get' + field.languageType.capitalize() + '(++i));\n';
+		else
+			return 'o.set' + field.funcName + '(rs.get' + field.languageType.capitalize() + '(++i));\n';
 	}
 
 	var javaClassCode =
@@ -126,7 +127,7 @@ function processDaoClass(package, classInfo){
 	javaClassCode +=
 	'\t}\n'+
 	'\n'+
-	'\tprivate PreparedStatement preparaPesquisa(String Sql, ' + classInfo.languageName + ' o) throws SQLException {\n'+
+	'\tprivate PreparedStatement preparaPesquisa(String sql, ' + classInfo.languageName + ' o) throws SQLException {\n'+
 	'\t\tString where = "";\n'+
 	'\t\tif(o != null) {\n';
 
@@ -136,9 +137,9 @@ function processDaoClass(package, classInfo){
 
 	javaClassCode +=
 	'\t\t}\n'+
-	'\t\twhere = where.replaceFirst("and", "WHERE");\n'+
+	'\t\twhere = where.replaceFirst("and", " WHERE");\n'+
 	'\t\t\n'+
-	'\t\tPreparedStatement ps = con.prepareStatement("SELECT ' + fieldsNamesAll.join(', ') + ' FROM " + TABLE_NAME + where);\n'+
+	'\t\tPreparedStatement ps = con.prepareStatement(sql + where);\n'+
 	'\t\tint i = 0;\n'+
 	'\t\tif(o != null) {\n';
 

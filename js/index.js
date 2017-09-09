@@ -61,7 +61,7 @@ window.onload = function(){
 
 	downloadAll.addEventListener('click', function (){
 		javaZipCode.generateAsync({type:"blob"}).then(function (blob) {
-			saveAs(blob, "javaClasses.zip");
+			saveAs(blob, inputPackage.value+"javaClasses.zip");
 		});
 	});
 
