@@ -136,7 +136,7 @@ function processDaoClass(package, classInfo){
 
 	javaClassCode +=
 	'\t\t}\n'+
-	'\t\twhere = where.replace("and", "WHERE");\n'+
+	'\t\twhere = where.replaceFirst("and", "WHERE");\n'+
 	'\t\t\n'+
 	'\t\tPreparedStatement ps = con.prepareStatement("SELECT ' + fieldsNamesAll.join(', ') + ' FROM " + TABLE_NAME + where);\n'+
 	'\t\tint i = 0;\n'+
