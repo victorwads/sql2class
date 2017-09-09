@@ -127,7 +127,7 @@ function processDaoClass(package, classInfo){
 	'\t}\n'+
 	'\n'+
 	'\tprivate PreparedStatement preparaPesquisa(String Sql, ' + classInfo.languageName + ' o) throws SQLException {\n'+
-	'\t\tString where = "";\n';
+	'\t\tString where = "";\n'+
 	'\t\tif(o != null) {\n';
 
 	for(i in fields){
