@@ -111,6 +111,7 @@ function processDaoClass(package, classInfo){
 	'import java.sql.SQLException;\n'+
 	'import java.sql.Statement;\n'+
 	'import java.util.ArrayList;\n'+
+	'import java.util.List;\n'+
 	'\n'+
 	'import '+package+'model.*;\n'+
 	'\n'+
@@ -259,9 +260,8 @@ function processDaoClass(package, classInfo){
 	'\t\treturn o;\n'+
 	'\t}\n'+
 	'\n'+
-	'\tpublic ' + classInfo.languageName + '[] listar(' + classInfo.languageName + ' pesquisa) {\n'+
-	'\t\tArrayList<' + classInfo.languageName + '> objs = new ArrayList<>();\n'+
-	'\t\t' + classInfo.languageName + '[] rt = null;\n'+
+	'\tpublic List<' + classInfo.languageName + '> listar(' + classInfo.languageName + ' pesquisa) {\n'+
+	'\t\tList<' + classInfo.languageName + '> objs = new ArrayList<>();\n'+
 	'\t\ttry {\n'+
 	'\t\t\tint i;\n'+
 	'\t\t\t' + classInfo.languageName + ' o;\n'+
@@ -272,17 +272,12 @@ function processDaoClass(package, classInfo){
 	'\t\t\t\tpopular(rs, o);\n'+
 	'\t\t\t\tobjs.add(o);\n'+
 	'\t\t\t}\n'+
-	'\t\t\trt = new ' + classInfo.languageName + '[objs.size()];\n'+
-	'\t\t\ti = 0;\n'+
-	'\t\t\tfor (' + classInfo.languageName + ' r : objs) {\n'+
-	'\t\t\t\trt[i++] = r;\n'+
-	'\t\t\t}\n'+
 	'\t\t} catch (Exception e) {\n'+
 	'\t\t\te.printStackTrace();\n'+
 	'\t\t} finally {\n'+
 	'\t\t\tclose();\n'+
 	'\t\t}\n'+
-	'\t\treturn rt;\n'+
+	'\t\treturn objs;\n'+
 	'\t}\n'+
 	'}\n';
 	return {
