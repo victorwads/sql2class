@@ -65,7 +65,7 @@ function processDaoClass(package, classInfo){
 	}
 	for(i in fields){
 		f = fields[i];
-		if(!fields[i].primary || primaryKey.length > 1){
+		if(!fields[i].auto){
 			fieldsNames.push(f.sqlName);
 			fieldsInsertPlaceHolders.push('?');
 		}
